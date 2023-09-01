@@ -2,6 +2,7 @@ package com.Utopia.Joren.DiceGameAPI.Security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -29,18 +30,25 @@ public class SecurityConfig {
 
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
+    @Order(1)
+    public SecurityFilterChain apiChain(HttpSecurity http) throws Exception{
 
             http.csrf(AbstractHttpConfigurer::disable);
-            http.authorizeHttpRequests(authorize -> authorize
-                    .anyRequest().authenticated());
-            http.authorizeHttpRequests((authorize -> authorize
-                    .requestMatchers(HttpMethod.GET).authenticated()));
             http.authorizeHttpRequests((authorize -> authorize
                     .requestMatchers("/api/auth/**")
                     .permitAll()));
             return http.build();
     }
+
+    @Bean
+    public SecurityFilterChain getMethodsChain(HttpSecurity http) throws Exception{
+
+        http.csrf(AbstractHttpConfigurer::disable);
+        http.authorizeHttpRequests(authorize -> authorize
+                .anyRequest().authenticated());
+        return http.build();
+    }
+
 
     @Bean
     public UserDetailsService users(){
