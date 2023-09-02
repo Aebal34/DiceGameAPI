@@ -2,11 +2,16 @@ package com.Utopia.Joren.DiceGameAPI.Model.Services;
 
 import com.Utopia.Joren.DiceGameAPI.Model.Domains.Role;
 import com.Utopia.Joren.DiceGameAPI.Model.Domains.UserEntity;
+import com.Utopia.Joren.DiceGameAPI.Model.Dto.LoginDto;
 import com.Utopia.Joren.DiceGameAPI.Model.Dto.RegisterDto;
 import com.Utopia.Joren.DiceGameAPI.Model.Repositories.RoleRepository;
 import com.Utopia.Joren.DiceGameAPI.Model.Repositories.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -18,11 +23,14 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
+    private final AuthenticationManager authenticationManager;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, RoleRepository roleRepository) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder,
+                       RoleRepository roleRepository, AuthenticationManager authenticationManager) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.roleRepository = roleRepository;
+        this.authenticationManager = authenticationManager;
     }
 
     public ResponseEntity<String> register(RegisterDto registerDto){
@@ -42,4 +50,17 @@ public class UserService {
 
         return new ResponseEntity<>("User registration correct!", HttpStatus.OK);
     }
+
+    public ResponseEntity<String> login(LoginDto loginDto){
+
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        loginDto.getEmail(),
+                        loginDto.getPassword()));
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        return new ResponseEntity<>("User signed success!", HttpStatus.OK);
+    }
+
 }
