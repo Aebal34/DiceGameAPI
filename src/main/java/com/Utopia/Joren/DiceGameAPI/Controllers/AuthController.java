@@ -1,5 +1,6 @@
 package com.Utopia.Joren.DiceGameAPI.Controllers;
 
+import com.Utopia.Joren.DiceGameAPI.Model.Dto.AuthResponseDto;
 import com.Utopia.Joren.DiceGameAPI.Model.Dto.LoginDto;
 import com.Utopia.Joren.DiceGameAPI.Model.Dto.RegisterDto;
 import com.Utopia.Joren.DiceGameAPI.Model.Repositories.RoleRepository;
@@ -31,7 +32,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody LoginDto loginDto){
+    public ResponseEntity<AuthResponseDto> login(@RequestBody LoginDto loginDto){
 
         return userService.login(loginDto);
     }

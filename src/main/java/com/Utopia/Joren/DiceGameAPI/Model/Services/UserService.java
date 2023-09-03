@@ -2,10 +2,12 @@ package com.Utopia.Joren.DiceGameAPI.Model.Services;
 
 import com.Utopia.Joren.DiceGameAPI.Model.Domains.Role;
 import com.Utopia.Joren.DiceGameAPI.Model.Domains.UserEntity;
+import com.Utopia.Joren.DiceGameAPI.Model.Dto.AuthResponseDto;
 import com.Utopia.Joren.DiceGameAPI.Model.Dto.LoginDto;
 import com.Utopia.Joren.DiceGameAPI.Model.Dto.RegisterDto;
 import com.Utopia.Joren.DiceGameAPI.Model.Repositories.RoleRepository;
 import com.Utopia.Joren.DiceGameAPI.Model.Repositories.UserRepository;
+import com.Utopia.Joren.DiceGameAPI.Security.JWTGenerator;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -24,13 +26,15 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
     private final AuthenticationManager authenticationManager;
+    private final JWTGenerator jwtGenerator;
 
     public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder,
-                       RoleRepository roleRepository, AuthenticationManager authenticationManager) {
+                       RoleRepository roleRepository, AuthenticationManager authenticationManager, JWTGenerator jwtGenerator) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.roleRepository = roleRepository;
         this.authenticationManager = authenticationManager;
+        this.jwtGenerator = jwtGenerator;
     }
 
     public ResponseEntity<String> register(RegisterDto registerDto){
@@ -51,7 +55,7 @@ public class UserService {
         return new ResponseEntity<>("User registration correct!", HttpStatus.OK);
     }
 
-    public ResponseEntity<String> login(LoginDto loginDto){
+    public ResponseEntity<AuthResponseDto> login(LoginDto loginDto){
 
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -60,7 +64,9 @@ public class UserService {
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        return new ResponseEntity<>("User signed success!", HttpStatus.OK);
+        String token = jwtGenerator.generateToken(authentication);
+
+        return new ResponseEntity<>(new AuthResponseDto(token), HttpStatus.OK);
     }
 
 }

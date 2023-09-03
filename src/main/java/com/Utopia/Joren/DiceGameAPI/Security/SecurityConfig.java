@@ -8,13 +8,21 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
+    private final JwtAuthEntryPoint entryPoint;
+
+    public SecurityConfig(JwtAuthEntryPoint entryPoint) {
+        this.entryPoint = entryPoint;
+    }
 
 
     @Bean
@@ -22,9 +30,12 @@ public class SecurityConfig {
     public SecurityFilterChain apiChain(HttpSecurity http) throws Exception{
 
             http.csrf(AbstractHttpConfigurer::disable);
+            http.exceptionHandling(exception -> exception.authenticationEntryPoint(entryPoint));
+            http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
             http.authorizeHttpRequests((authorize -> authorize
                     .requestMatchers("/api/auth/**")
                     .permitAll()));
+            http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
             return http.build();
     }
 
@@ -35,6 +46,11 @@ public class SecurityConfig {
         http.authorizeHttpRequests(authorize -> authorize
                 .anyRequest().authenticated());
         return http.build();
+    }
+
+    @Bean
+    public JwtAuthenticationFilter jwtAuthenticationFilter(){
+        return new JwtAuthenticationFilter();
     }
 
     @Bean
