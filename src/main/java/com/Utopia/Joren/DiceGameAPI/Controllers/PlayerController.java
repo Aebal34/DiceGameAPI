@@ -3,10 +3,7 @@ package com.Utopia.Joren.DiceGameAPI.Controllers;
 import com.Utopia.Joren.DiceGameAPI.Model.Dto.PlayerDto;
 import com.Utopia.Joren.DiceGameAPI.Model.Services.IPlayerService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/players")
@@ -24,4 +21,5 @@ public class PlayerController {
 
         return playerService.addPlayer(playerDto);
     }
+
 }

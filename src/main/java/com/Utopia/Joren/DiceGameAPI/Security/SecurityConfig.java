@@ -20,8 +20,14 @@ public class SecurityConfig {
 
     private final JwtAuthEntryPoint entryPoint;
 
-    public SecurityConfig(JwtAuthEntryPoint entryPoint) {
+    private final JWTGenerator jwtGenerator;
+
+    private final CustomUserDetailsService customUserDetailsService;
+
+    public SecurityConfig(JwtAuthEntryPoint entryPoint, JWTGenerator jwtGenerator, CustomUserDetailsService customUserDetailsService) {
         this.entryPoint = entryPoint;
+        this.jwtGenerator = jwtGenerator;
+        this.customUserDetailsService = customUserDetailsService;
     }
 
 
@@ -33,24 +39,15 @@ public class SecurityConfig {
             http.exceptionHandling(exception -> exception.authenticationEntryPoint(entryPoint));
             http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
             http.authorizeHttpRequests((authorize -> authorize
-                    .requestMatchers("/api/auth/**")
-                    .permitAll()));
+                    .requestMatchers("/api/auth/**").permitAll()
+                    .anyRequest().authenticated()));
             http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
             return http.build();
     }
 
     @Bean
-    public SecurityFilterChain getMethodsChain(HttpSecurity http) throws Exception{
-
-        http.csrf(AbstractHttpConfigurer::disable);
-        http.authorizeHttpRequests(authorize -> authorize
-                .anyRequest().authenticated());
-        return http.build();
-    }
-
-    @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter(){
-        return new JwtAuthenticationFilter();
+        return new JwtAuthenticationFilter(jwtGenerator, customUserDetailsService);
     }
 
     @Bean
