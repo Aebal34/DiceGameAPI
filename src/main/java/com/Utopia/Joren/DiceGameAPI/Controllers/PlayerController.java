@@ -8,6 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
 
 @RestController
@@ -37,4 +39,16 @@ public class PlayerController {
         return playerService.addPlayer(playerDto);
     }
 
+    @GetMapping
+    public ResponseEntity<List<PlayerDto>> getPlayers(){
+
+        return playerService.getAllByUser(getUserID());
+    }
+
+    private int getUserID(){
+
+        String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        return userService.findUserByEmail(userEmail).getBody().getId();
+    }
 }
