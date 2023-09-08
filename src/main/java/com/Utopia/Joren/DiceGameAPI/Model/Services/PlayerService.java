@@ -20,6 +20,7 @@ public class PlayerService implements IPlayerService{
 
         Player player = Player.builder()
                 .nickname(playerDto.getNickname())
+                .userID(playerDto.getUserID())
                 .build();
 
         playerRepository.save(player);

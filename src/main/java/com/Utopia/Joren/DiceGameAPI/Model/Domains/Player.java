@@ -22,6 +22,8 @@ public class Player {
     @Indexed(unique = true)
     private String nickname;
 
+    private int userID;
+
     @JsonManagedReference
     private List<Game> games = new ArrayList<>();
 

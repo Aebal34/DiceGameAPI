@@ -5,9 +5,11 @@ import com.Utopia.Joren.DiceGameAPI.Model.Domains.UserEntity;
 import com.Utopia.Joren.DiceGameAPI.Model.Dto.AuthResponseDto;
 import com.Utopia.Joren.DiceGameAPI.Model.Dto.LoginDto;
 import com.Utopia.Joren.DiceGameAPI.Model.Dto.RegisterDto;
+import com.Utopia.Joren.DiceGameAPI.Model.Dto.UserDto;
 import com.Utopia.Joren.DiceGameAPI.Model.Repositories.RoleRepository;
 import com.Utopia.Joren.DiceGameAPI.Model.Repositories.UserRepository;
 import com.Utopia.Joren.DiceGameAPI.Security.JWTGenerator;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -67,6 +69,18 @@ public class UserService {
         String token = jwtGenerator.generateToken(authentication);
 
         return new ResponseEntity<>(new AuthResponseDto(token), HttpStatus.OK);
+    }
+
+    public ResponseEntity<UserDto> findUserByEmail(String email){
+
+        UserEntity user = userRepository.findByEmail(email).get();
+
+        UserDto userDto = UserDto.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .build();
+
+        return new ResponseEntity<>(userDto, HttpStatus.OK);
     }
 
 }

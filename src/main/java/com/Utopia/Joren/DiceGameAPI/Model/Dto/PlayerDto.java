@@ -10,5 +10,7 @@ public class PlayerDto {
 
     private String nickname;
 
+    private int userID;
+
     private List<Game> games;
 }
