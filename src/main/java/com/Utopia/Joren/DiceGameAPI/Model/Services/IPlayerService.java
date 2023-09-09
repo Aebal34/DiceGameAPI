@@ -10,4 +10,8 @@ public interface IPlayerService {
     ResponseEntity<String> addPlayer(PlayerDto playerDto);
 
     ResponseEntity<List<PlayerDto>> getAllByUser(int userID);
+
+    ResponseEntity<String> editPlayersNickname(String nickname, String newNickname);
+
+    ResponseEntity<PlayerDto> getPlayerByNickname(String nickname);
 }

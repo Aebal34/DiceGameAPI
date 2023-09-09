@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface PlayerRepository extends MongoRepository<Player, Long> {
 
-    public Player findByNickname();
+    public Player findByNickname(String nickname);
 
 }
