@@ -1,5 +1,6 @@
 package com.Utopia.Joren.DiceGameAPI.Model.Services;
 
+import com.Utopia.Joren.DiceGameAPI.Model.Domains.Game;
 import com.Utopia.Joren.DiceGameAPI.Model.Domains.Player;
 import com.Utopia.Joren.DiceGameAPI.Model.Domains.UserEntity;
 import com.Utopia.Joren.DiceGameAPI.Model.Dto.PlayerDto;
@@ -68,20 +69,23 @@ public class PlayerService implements IPlayerService{
         return new ResponseEntity<>("Nickname changed.", HttpStatus.OK);
     }
 
+
+
     @Override
-    public ResponseEntity<PlayerDto> getPlayerByNickname(String nickname) {
+    public ResponseEntity<Player> getPlayerByNickname(String nickname) {
 
         Optional<Player> player = Optional.ofNullable(playerRepository.findByNickname(nickname));
-        if(player.isEmpty()){
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-        }
 
-        PlayerDto playerDto = PlayerDto.builder()
-                .userID(player.get().getUserID())
-                .nickname(player.get().getNickname())
-                .games(player.get().getGames())
-                .build();
+        return player.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
+                        .orElseGet(() -> new ResponseEntity<>(null, HttpStatus.NOT_FOUND));
+    }
 
-        return new ResponseEntity<>(playerDto, HttpStatus.OK);
+    @Override
+    public void addGameToPlayer(Game game) {
+
+        Player player = game.getPlayer();
+        player.getGames().add(game);
+
+        playerRepository.save(player);
     }
 }

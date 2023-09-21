@@ -1,5 +1,8 @@
 package com.Utopia.Joren.DiceGameAPI.Model.Services;
 
+import com.Utopia.Joren.DiceGameAPI.Model.Domains.Game;
+import com.Utopia.Joren.DiceGameAPI.Model.Domains.Player;
+import com.Utopia.Joren.DiceGameAPI.Model.Dto.GameDto;
 import com.Utopia.Joren.DiceGameAPI.Model.Dto.PlayerDto;
 import org.springframework.http.ResponseEntity;
 
@@ -13,5 +16,7 @@ public interface IPlayerService {
 
     ResponseEntity<String> editPlayersNickname(String nickname, String newNickname);
 
-    ResponseEntity<PlayerDto> getPlayerByNickname(String nickname);
+    ResponseEntity<Player> getPlayerByNickname(String nickname);
+
+    void addGameToPlayer(Game game);
 }

@@ -1,6 +1,10 @@
 package com.Utopia.Joren.DiceGameAPI.Controllers;
 
+import com.Utopia.Joren.DiceGameAPI.Model.Domains.Game;
+import com.Utopia.Joren.DiceGameAPI.Model.Domains.Player;
+import com.Utopia.Joren.DiceGameAPI.Model.Dto.GameDto;
 import com.Utopia.Joren.DiceGameAPI.Model.Dto.PlayerDto;
+import com.Utopia.Joren.DiceGameAPI.Model.Services.IGameService;
 import com.Utopia.Joren.DiceGameAPI.Model.Services.IPlayerService;
 import com.Utopia.Joren.DiceGameAPI.Model.Services.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -11,8 +15,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
-
 @RestController
 @RequestMapping("/players")
 @Slf4j
@@ -22,10 +24,12 @@ public class PlayerController {
 
     private final UserService userService;
 
+    private final IGameService gameService;
 
-    public PlayerController(IPlayerService playerService, UserService userService) {
+    public PlayerController(IPlayerService playerService, UserService userService, IGameService gameService) {
         this.playerService = playerService;
         this.userService = userService;
+        this.gameService = gameService;
     }
 
     @PostMapping
@@ -53,7 +57,7 @@ public class PlayerController {
 
         int userID = userService.findUserByEmail(userEmail).getBody().getId();
 
-        PlayerDto player = playerService.getPlayerByNickname(actualNickname).getBody();
+        Player player = playerService.getPlayerByNickname(actualNickname).getBody();
 
         if(player != null){
             if(player.getUserID() == userID){
@@ -65,6 +69,26 @@ public class PlayerController {
         return new ResponseEntity<>("This player belongs to another user.", HttpStatus.FORBIDDEN);
     }
 
+    @PostMapping("/{nickname}/games")
+    public ResponseEntity<String> rollDice(@PathVariable String nickname){
+
+        String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        int userID = userService.findUserByEmail(userEmail).getBody().getId();
+
+        Player player = playerService.getPlayerByNickname(nickname).getBody();
+
+        if(player != null){
+            if(player.getUserID() == userID){
+                Game game = new Game();
+                game.setPlayer(player);
+                playerService.addGameToPlayer(game);
+                return gameService.saveGame(game);
+            }
+        }else{
+            return new ResponseEntity<>("This player doesn't exist.", HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>("This player belongs to another user.", HttpStatus.FORBIDDEN);
+    }
 
     private int getUserID(){
 

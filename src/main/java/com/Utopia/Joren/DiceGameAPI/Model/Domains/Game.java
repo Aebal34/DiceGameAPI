@@ -2,6 +2,7 @@ package com.Utopia.Joren.DiceGameAPI.Model.Domains;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.Id;
+import lombok.Builder;
 import lombok.Data;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -14,6 +15,8 @@ public class Game {
 
     private int result;
 
+    private boolean win;
+
     @JsonBackReference
     private Player player;
 
@@ -22,5 +25,6 @@ public class Game {
         int dice2 = (int)(Math.random()*6+1);
 
         this.result = dice1+dice2;
+        this.win = result == 7;
     }
 }

@@ -26,6 +26,4 @@ public class Player {
 
     @JsonManagedReference
     private List<Game> games = new ArrayList<>();
-
-
 }
